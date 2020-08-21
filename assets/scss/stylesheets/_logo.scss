@@ -1,0 +1,24 @@
+/*
+*
+		========================================
+		  1. Logo
+		========================================
+
+		  Date Created: #{$date-create}
+		  Created By:   #{$name}
+		  Last Updated: --/--/----
+		  Updated By:   #{$name}
+
+*
+*/
+
+.logo {
+  a {
+    padding: 0.75rem;
+    color: $black;
+    &:hover {
+      color: $red-ryb;
+      text-decoration: none;
+    }
+  }
+}

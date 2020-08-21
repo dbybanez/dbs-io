@@ -82,6 +82,6 @@ export default {
     //     '@babel/plugin-syntax-dynamic-import'
     //   ]
     // },
-    // transpile: ['~/plugins/services/PostService.js']
+    transpile: ['~/plugins/services/PostService.js']
   }
 }
