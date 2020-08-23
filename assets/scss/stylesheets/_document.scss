@@ -17,3 +17,14 @@ body {
   background-color: $white;
   
 }
+
+#__nuxt, #__layout, html, body, .app {
+  height: 100%;
+}
+
+body {
+  .app {
+    display: flex;
+    flex-direction: column;
+  }
+}

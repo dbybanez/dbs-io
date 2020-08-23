@@ -14,9 +14,11 @@ app.use(express.urlencoded({ extended:false }))
 
 const posts = require('./routes/api/posts')
 const test = require('./routes/api/test')
+const checkConnection = require('./routes/api/checkConnection')
 
 app.use('/api/posts', posts)
 app.use('/api/test', test)
+app.use('/api/checkconnection', checkConnection)
 
 // Handle production
 if(process.env.NODE_ENV === 'production') {
