@@ -56,18 +56,13 @@ async function checkMongoDBConnection() {
 // MySQL Connect
 async function checkMySQLConnection() {
   let connection = mysql.createConnection(mysqlConfig)
-  let result = false
   
   try {
     connection.connect()
-    //console.log(connection.ping())
-    console.log(connection)
   } catch (err) {
-    // return err
     console.log(err)
   } finally {
-    if( connection && connection.end ) connection.end()
-    //return result;
+    return true
   }
 }
 
