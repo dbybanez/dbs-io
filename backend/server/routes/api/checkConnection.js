@@ -35,7 +35,7 @@ router.get('/mongo', async (req, res) => {
 
 router.get('/mysql', async (req, res) => {
   let result = await checkMySQLConnection()
-  res.send(await result)
+  res.send(result)
 })
 
 // MongoDB Connect
@@ -55,52 +55,26 @@ async function checkMongoDBConnection() {
 
 // MySQL Connect
 async function checkMySQLConnection() {
-  let connection = mysql.createConnection(mysqlConfig)
-  let result = false
-
-  try {
-    connection.connect()
-    console.log('connected as id ' + connection.threadId);
-  } catch (err) {
-    console.log('error connecting: ' + err.stack);
-    return
-  } finally {
-    return connection.threadId
-  }
-
-  //return result 
-  
-  // try {
-  //   connection.connect((err) => {
-  //     if(err) return false
-  //   })
-  //   result = await getEmployeeList(connection)
-  // } catch (err) {
-  //   return false
-  // } finally {
-  //   if( connection && connection.end ) connection.end()
-  //   return result;
-  // }
+  return new Promise (async (resolve, reject) => {
+    let connection = mysql.createConnection(mysqlConfig)
+    let status = false
+    try {
+      connection.connect((err) => {
+        if(err) {
+          status = false
+          resolve(status)
+        } 
+        status = true
+        resolve(status)
+      })
+    } catch (err) {
+      status = false
+      reject(status)
+    } finally {
+      if( connection && connection.end ) connection.end()
+      return status;
+    }
+  })
 }
-
-// async function getEmployeeList( connection ) {
-//   return new Promise((resolve, reject)  => {
-//     var result
-//     var query_result = []
-//     var res
-//     var query = "SELECT 1"
-//     connection.query(query, function (error, results, fields) {
-//       if (error) reject(false)
-//       if(results.length > 0) {
-//         for (result in results) {
-//           query_result.push(results[result])
-//         }
-//       }
-//       res = JSON.parse(JSON.stringify(query_result))
-//       resolve(true)
-//     })
-//   })
-// }
-
 
 module.exports = router
