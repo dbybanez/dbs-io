@@ -56,26 +56,51 @@ async function checkMongoDBConnection() {
 // MySQL Connect
 async function checkMySQLConnection() {
   let connection = mysql.createConnection(mysqlConfig)
-  
+  let result = false
+
   try {
     connection.connect()
+    console.log('connected as id ' + connection.threadId);
   } catch (err) {
-    console.log(err)
+    console.log('error connecting: ' + err.stack);
+    return
   } finally {
-    return true
+    return connection.threadId
   }
+
+  //return result 
+  
+  // try {
+  //   connection.connect((err) => {
+  //     if(err) return false
+  //   })
+  //   result = await getEmployeeList(connection)
+  // } catch (err) {
+  //   return false
+  // } finally {
+  //   if( connection && connection.end ) connection.end()
+  //   return result;
+  // }
 }
 
-// async function checkMySQLConnection() {
-//   return new Promise ((resolve, reject) => {
-//     let connection = mysql.createConnection(mysqlConfig)
-//     connection.connect( (err) => {
-//       if (err) {
-//         reject(1)
+// async function getEmployeeList( connection ) {
+//   return new Promise((resolve, reject)  => {
+//     var result
+//     var query_result = []
+//     var res
+//     var query = "SELECT 1"
+//     connection.query(query, function (error, results, fields) {
+//       if (error) reject(false)
+//       if(results.length > 0) {
+//         for (result in results) {
+//           query_result.push(results[result])
+//         }
 //       }
+//       res = JSON.parse(JSON.stringify(query_result))
 //       resolve(true)
 //     })
 //   })
 // }
+
 
 module.exports = router
