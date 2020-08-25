@@ -18,9 +18,9 @@ let mysqlConfig = {
 }
 
 let mssqlConfig = {
-  user: '',
-  password: '',
-  server: '',
+  user: 'admin',
+  password: 'admin',
+  server: 'DAVID-LAPTOP\\SQLEXPRESS01',
   database: 'retaildb_mssql',
   port: 1433,
   options: {
@@ -38,12 +38,17 @@ router.get('/mysql', async (req, res) => {
   res.send(result)
 })
 
+router.get('/mssql', async (req, res) => {
+  let result = await checkMSSQLConnection()
+  res.send(result)
+})
+
 // MongoDB Connect
 async function checkMongoDBConnection() {
   let client = null
 
   try {
-    client = await mongodb.MongoClient.connect('mongodb://localhost:27017/retaildb_mongodb', {
+    client = await mongodb.MongoClient.connect(mongoConfig, {
       useNewUrlParser: true
     })
   } catch (err) {
@@ -74,6 +79,47 @@ async function checkMySQLConnection() {
     } finally {
       if( connection && connection.end ) connection.end()
       return status;
+    }
+  })
+}
+
+// MSSQL Connect
+async function checkMSSQLConnection() {
+  return new Promise (async (resolve, reject) => {
+    let pool = new mssql.ConnectionPool(mssqlConfig)
+    let result = {
+      status: false
+    }
+    try {
+      pool.connect( (err) => {
+        if(err) {
+          result.error = {
+            code: err.code,
+            message: err.message
+          }
+          console.log('sayyyyy ')
+          result.status = false
+          resolve(result)
+        } else {
+          result.success = {
+            message: 'Connected successfully.'
+          }
+          console.log('whattt?')
+          result.status = true
+          resolve(result)
+        }
+        
+      })
+    } catch (err) {
+      result.error = {
+        code: err.code,
+        message: err.message
+      }
+      result.status = false
+      reject(result)
+    } finally {
+      // if( pool && pool.close ) pool.close()
+      return result.status
     }
   })
 }
