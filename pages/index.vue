@@ -23,7 +23,7 @@ export default {
   },
   head () {
     return {
-      title: 'Welcome to dad jokes',
+      title: 'DBS.IO',
       meta: [
         {
           hid: 'description',
