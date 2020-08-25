@@ -1,5 +1,5 @@
 const express = require('express')
-const mongodb = require('mongodb')
+const { MongoClient } = require('mongodb')
 const mysql = require('mysql')
 const mssql = require('mssql')
 
@@ -44,41 +44,89 @@ router.get('/mssql', async (req, res) => {
 })
 
 // MongoDB Connect
-async function checkMongoDBConnection() {
-  let client = null
+// async function checkMongoDBConnection() {
+//   let client = null
 
-  try {
-    client = await mongodb.MongoClient.connect(mongoConfig, {
-      useNewUrlParser: true
-    })
-  } catch (err) {
-    console.log(err)
-  } finally {
-    return !!client && !!client.topology && client.topology.isConnected()
-  }
+//   try {
+//     client = await mongodb.MongoClient.connect(mongoConfig, {
+//       useNewUrlParser: true
+//     })
+//   } catch (err) {
+//     console.log(err)
+//   } finally {
+//     return !!client && !!client.topology && client.topology.isConnected()
+//   }
+// }
+
+async function checkMongoDBConnection() {
+  return new Promise ( (resolve, reject) => {
+    let client = MongoClient(mongoConfig, { useNewUrlParser: true })
+    let result = {
+      status: false
+    }
+    try {
+      client.connect((err) => {
+        if(err) {
+          result.error = {
+            message: err.message
+          }
+          result.status = false
+          resolve(result)
+        } else {
+          result.success = {
+            message: 'Connected successfully.'
+          }
+          result.status = true
+          resolve(result)
+        }
+      })
+    } catch (err) {
+      result.error = {
+        message: err.message
+      }
+      result.status = false
+      reject(result)
+    } finally {
+      client.close()
+    }
+  })
 }
 
 // MySQL Connect
 async function checkMySQLConnection() {
   return new Promise (async (resolve, reject) => {
     let connection = mysql.createConnection(mysqlConfig)
-    let status = false
+    let result = {
+      status: false
+    }
     try {
       connection.connect((err) => {
         if(err) {
-          status = false
-          resolve({msg: err.code, active: status})
+          result.error = {
+            code: err.code,
+            message: err.message
+          }
+          result.status = false
+          resolve(result)
+        } else {
+          result.success = {
+            message: 'Connected successfully.',
+            connection_id: connection.threadId
+          }
+          result.status = true
+          resolve(result)
         }
-
-        status = true
-        resolve({msg: [{"connection_id": connection.threadId}], active: status})
       })
     } catch (err) {
-      status = false
-      reject(status)
+      result.error = {
+        code: err.code,
+        message: err.message
+      }
+      result.status = false
+      reject(result)
     } finally {
       if( connection && connection.end ) connection.end()
-      return status;
+      return result.status;
     }
   })
 }
@@ -97,14 +145,12 @@ async function checkMSSQLConnection() {
             code: err.code,
             message: err.message
           }
-          console.log('sayyyyy ')
           result.status = false
           resolve(result)
         } else {
           result.success = {
             message: 'Connected successfully.'
           }
-          console.log('whattt?')
           result.status = true
           resolve(result)
         }
