@@ -62,10 +62,11 @@ async function checkMySQLConnection() {
       connection.connect((err) => {
         if(err) {
           status = false
-          resolve(status)
-        } 
+          resolve({msg: err.code, active: status})
+        }
+
         status = true
-        resolve(status)
+        resolve({msg: [{"connection_id": connection.threadId}], active: status})
       })
     } catch (err) {
       status = false
