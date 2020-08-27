@@ -6,7 +6,7 @@
           <img class="w-75" src="~/assets/images/mysql-logo.svg" />
         </div>
       </div>
-      <p class="mt-3 mb-0 text-center"><i class="mdi mdi-circle" v-bind:class="[(this.dbStatus[1].isLoading) ? 'text-warning': (this.dbStatus[1].isActive) ? 'text-success' : 'text-danger']"></i> {{ dbStatus[1].status }}</p>
+      <p class="mt-3 mb-0 text-center"><i class="mdi mdi-circle" v-bind:class="[(this.mysql.isLoading) ? 'text-warning': (this.mysql.isActive) ? 'text-success' : 'text-danger']"></i> {{ mysql.status }}</p>
       <!-- <DatabaseStatus /> -->
     </div>
     <div class="col mb-4">
@@ -15,7 +15,7 @@
           <img class="w-75" src="~/assets/images/microsoft-sql-server-logo.svg" />
         </div>
       </div>
-      <p class="mt-3 mb-0 text-center"><i class="mdi mdi-circle" v-bind:class="[(this.dbStatus[2].isLoading) ? 'text-warning': (this.dbStatus[2].isActive) ? 'text-success' : 'text-danger']"></i> {{ dbStatus[2].status }}</p>
+      <p class="mt-3 mb-0 text-center"><i class="mdi mdi-circle" v-bind:class="[(this.mssql.isLoading) ? 'text-warning': (this.mssql.isActive) ? 'text-success' : 'text-danger']"></i> {{ mssql.status }}</p>
       <!-- <DatabaseStatus /> -->
     </div>
     <div class="col mb-4">
@@ -24,7 +24,7 @@
           <img class="w-75" src="~/assets/images/mongodb-logo.svg" />
         </div>
       </div>
-      <p class="mt-3 mb-0 text-center"><i class="mdi mdi-circle" v-bind:class="[(this.dbStatus[0].isLoading) ? 'text-warning': (this.dbStatus[0].isActive) ? 'text-success' : 'text-danger']"></i> {{ dbStatus[0].status }}</p>
+      <p class="mt-3 mb-0 text-center"><i class="mdi mdi-circle" v-bind:class="[(this.mongo.isLoading) ? 'text-warning': (this.mongo.isActive) ? 'text-success' : 'text-danger']"></i> {{ mongo.status }}</p>
       <!-- <DatabaseStatus /> -->
     </div>
   </div>
@@ -36,29 +36,24 @@ import axios from 'axios'
 export default {
   data () {
     return {
-      dbStatus: [
-        {
-          db: 'mongo',
-          status: 'Loading...',
-          isActive: false,
-          hasError: false,
-          isLoading: true
-        },
-        {
-          db: 'mysql',
-          status: 'Loading...',
-          isActive: false,
-          hasError: false,
-          isLoading: true
-        },
-        {
-          db: 'mssql',
-          status: 'Loading...',
-          isActive: false,
-          hasError: false,
-          isLoading: true
-        }
-      ]
+      mongo: {
+        status: 'Loading...',
+        isActive: false,
+        hasError: false,
+        isLoading: true
+      },
+      mysql: {
+        status: 'Loading...',
+        isActive: false,
+        hasError: false,
+        isLoading: true
+      },
+      mssql: {
+        status: 'Loading...',
+        isActive: false,
+        hasError: false,
+        isLoading: true
+      }
     }
   },
   async created () {
@@ -73,15 +68,15 @@ export default {
     try {
       const res = await axios.get('http://localhost:5000/api/checkconnection/mongo', config)
       if (res.data.status) {
-        this.dbStatus[0].isActive = true
-        this.dbStatus[0].hasError = false
-        this.dbStatus[0].isLoading = false
-        this.dbStatus[0].status = 'Online'
+        this.mongo.isActive = true
+        this.mongo.hasError = false
+        this.mongo.isLoading = false
+        this.mongo.status = 'Online'
       } else {
-        this.dbStatus[0].isActive = false
-        this.dbStatus[0].hasError = true
-        this.dbStatus[0].isLoading = false
-        this.dbStatus[0].status = 'Offline'
+        this.mongo.isActive = false
+        this.mongo.hasError = true
+        this.mongo.isLoading = false
+        this.mongo.status = 'Offline'
       }
     } catch (err) {
       // reject('Loading...')
@@ -90,15 +85,15 @@ export default {
     try {
       const res = await axios.get('http://localhost:5000/api/checkconnection/mysql', config)
       if (res.data.status) {
-        this.dbStatus[1].isActive = true
-        this.dbStatus[1].hasError = false
-        this.dbStatus[1].isLoading = false
-        this.dbStatus[1].status = 'Online'
+        this.mysql.isActive = true
+        this.mysql.hasError = false
+        this.mysql.isLoading = false
+        this.mysql.status = 'Online'
       } else {
-        this.dbStatus[1].isActive = false
-        this.dbStatus[1].hasError = true
-        this.dbStatus[1].isLoading = false
-        this.dbStatus[1].status = 'Offline'
+        this.mysql.isActive = false
+        this.mysql.hasError = true
+        this.mysql.isLoading = false
+        this.mysql.status = 'Offline'
       }
     } catch (err) {
       // test
@@ -107,15 +102,15 @@ export default {
     try {
       const res = await axios.get('http://localhost:5000/api/checkconnection/mssql', config)
       if (res.data.status) {
-        this.dbStatus[2].isActive = true
-        this.dbStatus[2].hasError = false
-        this.dbStatus[2].isLoading = false
-        this.dbStatus[2].status = 'Online'
+        this.mssql.isActive = true
+        this.mssql.hasError = false
+        this.mssql.isLoading = false
+        this.mssql.status = 'Online'
       } else {
-        this.dbStatus[2].isActive = false
-        this.dbStatus[2].hasError = true
-        this.dbStatus[2].isLoading = false
-        this.dbStatus[2].status = 'Offline'
+        this.mssql.isActive = false
+        this.mssql.hasError = true
+        this.mssql.isLoading = false
+        this.mssql.status = 'Offline'
       }
     } catch (err) {
       // test
