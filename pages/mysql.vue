@@ -4,22 +4,38 @@
     <div class="create-post">
       <label for="create-post">Add a document: </label><br><br>
       <div class="form-inline">
-        <input class="form-control mr-3" type="text" id="create-post" v-model="text" placeholder="Create a post">
-        <button class="btn btn-primary" v-on:click="createPost">Post!</button>
+        <input id="create-post" v-model="text" class="form-control mr-3" type="text" placeholder="Create a post">
+        <button class="btn btn-primary" @click="createPost">
+          Post!
+        </button>
       </div>
     </div>
     <hr>
-    <p class="error" v-if="error">{{ error }}</p>
+    <p v-if="error" class="error">
+      {{ error }}
+    </p>
     <div class="posts-container">
       <table class="table table-bordered">
         <thead>
           <tr>
-            <th width="3%">ID</th>
-            <th width="10%">Last Name</th>
-            <th width="10%">First Name</th>
-            <th width="10%">Birth Date</th>
-            <th width="10%">Photo</th>
-            <th width="20%">Notes</th>
+            <th width="3%">
+              ID
+            </th>
+            <th width="10%">
+              Last Name
+            </th>
+            <th width="10%">
+              First Name
+            </th>
+            <th width="10%">
+              Birth Date
+            </th>
+            <th width="10%">
+              Photo
+            </th>
+            <th width="20%">
+              Notes
+            </th>
           </tr>
         </thead>
         <!-- <tbody>
@@ -35,10 +51,10 @@
         <tbody>
           <tr
             v-for="(post, index) in posts"
-            v-bind:item="post"
-            v-bind:index="index"
-            v-bind:key="post.EmployeeID"
-            v-on:dblclick="deletePost(post.EmployeeID)">
+            :key="post.EmployeeID"
+            :item="post"
+            :index="index"
+            @dblclick="deletePost(post.EmployeeID)">
             <td>{{ post.EmployeeID }}</td>
             <td>{{ post.LastName }}</td>
             <td>{{ post.FirstName }}</td>

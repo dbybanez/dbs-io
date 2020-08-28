@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-content-center" v-if="show">
+  <div class="row justify-content-center" v-if="showComponent">
     <div class="col-8">
       <p class="my-3 text-center">To run a quick test, click Run test.</p>
       <div class="row">
@@ -19,15 +19,26 @@ export default {
   name: 'DefaultRunTest',
   data () {
     return {
-      show: true
+      showComponent: true
+    }
+  },
+  props: {
+    resetLoadTest: {
+      type: Boolean
     }
   },
   methods: {
     runTest () {
-      this.$emit('run-test', this.show)
-      this.show = !this.show
+      this.showComponent = false
+      this.$emit('runTestClicked', true)
     }
   }
+  // watch: {
+  //   resetLoadTest () {
+  //     this.showComponent = true
+  //     console.log('run test reset')
+  //   }
+  // }
 }
 </script>
 

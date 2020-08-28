@@ -4,8 +4,8 @@
       <div class="col-9">
         <DatabaseLoader />
         <EnvironmentChecker />
-        <ConnectionProgress v-on:run-test="updateStatus" />
-        <DefaultRunTest />
+        <ConnectionProgress :run-test-connection="runTestTriggered" v-on:testCompleted="resetRunTest" />
+        <DefaultRunTest v-on:runTestClicked="updateRunTest" :reset-load-test="resetTest"/>
       </div>
     </div>
   </div>
@@ -26,13 +26,18 @@ export default {
   },
   data () {
     return {
-      isRunTest: false
+      runTestTriggered: false,
+      resetTest: false
     }
   },
-  props: ['run-test'],
   methods: {
-    updateStatus () {
-      this.isRunTest = !this.isRunTest
+    updateRunTest () {
+      this.runTestTriggered = true
+      console.log('going to test now...')
+    },
+    resetRunTest () {
+      console.log('going to reset now...')
+      this.resetTest = true
     }
   },
   head () {
