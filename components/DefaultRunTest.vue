@@ -1,6 +1,8 @@
 <template>
   <div class="row justify-content-center" v-if="showComponent">
-    <div class="col-8">
+    <div class="col-8 text-center">
+      <button @click="incrementOne(1)" class="btn btn-primary btn-sm mt-3">Increment 1</button>
+      <button @dblclick="incrementTwo(2)" class="btn btn-primary btn-sm mt-3">Increment 2</button>
       <p class="my-3 text-center">To run a quick test, click Run test.</p>
       <div class="row">
         <div class="col">
@@ -15,6 +17,8 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'DefaultRunTest',
   data () {
@@ -28,9 +32,16 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['incrementByTwo', 'incrementByOne']),
     runTest () {
       this.showComponent = false
       this.$emit('runTestClicked', true)
+    },
+    incrementOne (val) {
+      this.incrementByOne(val)
+    },
+    incrementTwo (val) {
+      this.incrementByTwo(val)
     }
   }
   // watch: {

@@ -38,16 +38,8 @@ export default {
       type: Boolean
     }
   },
-  // watch: {
-  //   runTestConnection (val) {
-  //     this.showComponent = true
-  //     this.processConnection()
-  //   }
-  // },
-  created () {
-    this.$on(this.runTestConnection, (data) => {
-      console.log('im hereee')
-    })
+  mounted () {
+    console.log(this.runTestConnection)
   },
   methods: {
     runTest () {
