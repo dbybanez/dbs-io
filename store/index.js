@@ -28,6 +28,9 @@ export const actions = {
   incrementByOne ({ commit }, val) {
     const total = val
     commit('increment', total)
+    setTimeout(() => {
+      commit('decrement', total)
+    }, 3000)
   },
   decrementByTwo ({ commit }, val) {
     const total = val
