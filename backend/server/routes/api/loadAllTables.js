@@ -49,9 +49,9 @@ async function checkMongoDBConnection() {
     let result = {
       status: false
     }
-
     let collections = []
-    let collectionData = []
+    let collectionsData = []
+
     try {
       client.connect( async (err) => {
         if(err) {
@@ -73,9 +73,19 @@ async function checkMongoDBConnection() {
           // collections.forEach(collection => {
           //   console.log(collection)
           // })
-          let data = await client.db(mongo_database).collection('EmployeeList')
-          console.log(await data.find({}).toArray())
-          resolve(data.find({}).toArray())
+          Promise.all(collections.forEach(async (collection, index) => {
+            collectionsData.push(await retrieveAllCollectionData(collection, client))
+          }))
+          // collectionsData = await retrieveAllCollectionData(collections, client)
+          
+          // let data = await client.db(mongo_database).collection('EmployeeList')
+          // console.log(await data.find({}).toArray())
+          // console.log(collectionData)
+          // resolve(data.find({}).toArray())
+          // console.log(collectionsData)
+          // console.log(await collectionsData[0])
+          // resolve(collectionsData)
+          resolve(collectionsData)
         }
       })
     } catch (err) {
@@ -88,6 +98,22 @@ async function checkMongoDBConnection() {
       client.close()
     }
   })
+}
+
+async function retrieveAllCollectionData (collection, client) {
+  return new Promise(async (resolve, reject) => {
+    let value = await client.db(mongo_database).collection(collection).find({}).toArray()
+    // data.push(client.db(mongo_database).collection(collection).find({}).toArray())
+    // await client.db(mongo_database).collection(collection).find({}).toArray()
+    // console.log(client.db(mongo_database).collection(collection).find({}).toArray())
+    resolve(value)
+    // reject(new Error)
+  })
+  // collections.forEach( (collection, index ) => {
+  //   return new Promise((resolve, reject) => {
+  //     let data = await client.db(mongo_database).collection(collection).find({}).toArray()
+  //   })
+  // })
 }
 
 // MySQL Connect

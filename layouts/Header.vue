@@ -8,8 +8,8 @@
         <div class="col">
           <div class="main-navigation float-right">
             <ul>
-              <li><nuxt-link to="/">Test</nuxt-link></li>
-              <li><nuxt-link to="/about">About</nuxt-link></li>
+              <li :class="{active: this.$route.name === 'index'}"><nuxt-link to="/">Test</nuxt-link></li>
+              <li :class="{active: this.$route.name === 'about'}"><nuxt-link to="/about">About</nuxt-link></li>
             </ul>
           </div>
         </div>
@@ -20,6 +20,26 @@
 
 <script>
 export default {
-  name: 'Header'
+  name: 'Header',
+  methods: {
+    updateLinks () {
+      console.log(this.$route.name)
+    }
+  }
 }
 </script>
+<style lang="scss" scoped>
+  @import "../assets/scss/stylesheets/variables";
+  .active {
+    a {
+      color: $red-ryb;
+    }
+    &::after {
+      content: "";
+      display: block;
+      background-color: $red-ryb;
+      height: 2px;
+      margin-top:-2px;
+    }
+  }
+</style>
