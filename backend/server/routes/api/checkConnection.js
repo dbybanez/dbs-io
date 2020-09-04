@@ -20,7 +20,8 @@ let mysqlConfig = {
 let mssqlConfig = {
   user: 'admin',
   password: 'admin',
-  server: 'DAVID-LAPTOP\\SQLEXPRESS01',
+  // server: 'DAVID-LAPTOP\\SQLEXPRESS01',
+  server: 'PH-B8M91Z2\\SQLEXPRESS',
   database: 'retaildb_mssql',
   port: 1433,
   options: {

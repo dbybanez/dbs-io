@@ -20,7 +20,8 @@ let mysqlConfig = {
 let mssqlConfig = {
   user: 'admin',
   password: 'admin',
-  server: 'DAVID-LAPTOP\\SQLEXPRESS01',
+  // server: 'DAVID-LAPTOP\\SQLEXPRESS01',
+  server: 'PH-B8M91Z2\\SQLEXPRESS',
   database: 'retaildb_mssql',
   port: 1433,
   options: {
@@ -35,7 +36,7 @@ router.get('/mongo', async (req, res) => {
 
 router.get('/mysql', async (req, res) => {
   let result = await checkMySQLConnection()
-  res.send(result)
+  res.send(await result)
 })
 
 router.get('/mssql', async (req, res) => {
@@ -49,8 +50,8 @@ async function checkMongoDBConnection() {
     let result = {
       status: false
     }
+
     let collections = []
-    let collectionsData = []
 
     try {
       client.connect( async (err) => {
@@ -69,23 +70,18 @@ async function checkMongoDBConnection() {
             collections.push(child.name)
           })
 
-          // Loop all collections and load every data 
-          // collections.forEach(collection => {
-          //   console.log(collection)
-          // })
-          Promise.all(collections.forEach(async (collection, index) => {
-            collectionsData.push(await retrieveAllCollectionData(collection, client))
-          }))
-          // collectionsData = await retrieveAllCollectionData(collections, client)
-          
-          // let data = await client.db(mongo_database).collection('EmployeeList')
-          // console.log(await data.find({}).toArray())
-          // console.log(collectionData)
-          // resolve(data.find({}).toArray())
-          // console.log(collectionsData)
-          // console.log(await collectionsData[0])
-          // resolve(collectionsData)
-          resolve(collectionsData)
+          let promises = []
+
+          // Loop all collections and load every promise to promises[]
+          collections.forEach((collection, index) => {
+            promises.push(retrieveAllCollectionData(collection, client))
+          })
+
+          // Promise all loops and resolve result
+          Promise.all(promises).then((result) => {
+            client.close()
+            resolve(result)
+          })
         }
       })
     } catch (err) {
@@ -95,25 +91,20 @@ async function checkMongoDBConnection() {
       result.status = false
       reject(result)
     } finally {
-      client.close()
+      // client.close()
     }
   })
 }
 
 async function retrieveAllCollectionData (collection, client) {
   return new Promise(async (resolve, reject) => {
-    let value = await client.db(mongo_database).collection(collection).find({}).toArray()
-    // data.push(client.db(mongo_database).collection(collection).find({}).toArray())
-    // await client.db(mongo_database).collection(collection).find({}).toArray()
-    // console.log(client.db(mongo_database).collection(collection).find({}).toArray())
+    let result = await client.db(mongo_database).collection(collection).find({}).toArray()
+    let value = {
+      collectionName: collection,
+      collectionData: result
+    }
     resolve(value)
-    // reject(new Error)
   })
-  // collections.forEach( (collection, index ) => {
-  //   return new Promise((resolve, reject) => {
-  //     let data = await client.db(mongo_database).collection(collection).find({}).toArray()
-  //   })
-  // })
 }
 
 // MySQL Connect
@@ -123,6 +114,7 @@ async function checkMySQLConnection() {
     let result = {
       status: false
     }
+
     try {
       connection.connect((err) => {
         if(err) {
@@ -133,12 +125,23 @@ async function checkMySQLConnection() {
           result.status = false
           resolve(result)
         } else {
-          result.success = {
-            message: 'Connected successfully.',
-            connection_id: connection.threadId
-          }
-          result.status = true
-          resolve(result)
+          let promises = []
+
+          connection.query("SHOW TABLES", function (error, results, fields) {
+            if(error) throw error
+            // console.log(results)
+            if(results.length > 0) {
+              for (result in results) {
+                let table = JSON.parse(JSON.stringify(results[result])).Tables_in_retaildb_mysql
+                promises.push(retrieveAllTableDataMySQL(table, connection))
+                // console.log(retrieveAllTableDataMySQL(table, connection))
+              }
+              Promise.all(promises).then((result) => {
+                if( connection && connection.end ) connection.end()
+                resolve(result)
+              })
+            }
+          })
         }
       })
     } catch (err) {
@@ -149,9 +152,31 @@ async function checkMySQLConnection() {
       result.status = false
       reject(result)
     } finally {
-      if( connection && connection.end ) connection.end()
-      return result.status;
+      // if( connection && connection.end ) connection.end()
+      // return result.status;
     }
+  })
+}
+
+async function retrieveAllTableDataMySQL (table, connection) {
+  return new Promise(async (resolve, reject) => {
+    let result
+    let query = `SELECT * FROM ${table}`
+    let query_result = []
+    await connection.query(query, function (error, results, fields) {
+      if(error) throw error
+      if(results.length > 0) {
+        for (result in results) {
+          query_result.push(results[result])
+        }
+      }
+      let res = JSON.parse(JSON.stringify(query_result))
+      let value = {
+        tableName: table,
+        tableData: res
+      }
+      resolve(value)
+    })
   })
 }
 
@@ -172,11 +197,23 @@ async function checkMSSQLConnection() {
           result.status = false
           resolve(result)
         } else {
-          result.success = {
-            message: 'Connected successfully.'
-          }
-          result.status = true
-          resolve(result)
+          let promises = []
+          // console.log('hey')
+          pool.query("SELECT Distinct TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", function (error, results, fields) {
+            if(error) throw error
+            if(results.recordset.length > 0) {
+              for(result in results.recordset) {
+                let table = JSON.parse(JSON.stringify(results.recordset[result].TABLE_NAME))
+                promises.push(retrieveAllTableDataMSSQL(table, pool))
+              }
+              Promise.all(promises).then((result) => {
+                if( pool && pool.close ) pool.close()
+                resolve(result)
+              })
+            }
+          })
+
+          
         }
         
       })
@@ -189,8 +226,30 @@ async function checkMSSQLConnection() {
       reject(result)
     } finally {
       // if( pool && pool.close ) pool.close()
-      return result.status
+      // return result.status
     }
+  })
+}
+
+async function retrieveAllTableDataMSSQL (table, pool) {
+  return new Promise(async (resolve, reject) => {
+    let result
+    let query = `SELECT * FROM ${table}`
+    let query_result = []
+    await pool.query(query, function (error, results, fields) {
+      if(error) throw error
+      if(results.recordset.length > 0) {
+        for (result in results.recordset) {
+          query_result.push(results.recordset[result])
+        }
+      }
+      let res = JSON.parse(JSON.stringify(query_result))
+      let value = {
+        tableName: table,
+        tableData: res
+      }
+      resolve(value)
+    })
   })
 }
 
