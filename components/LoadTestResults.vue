@@ -55,7 +55,7 @@
         </div>
         <div class="col-4 border-right px-4">
           <div class="row align-items-center">
-            <div class="col">
+            <div class="col-7">
               <dl class="row mt-3">
                 <dt class="col-6">Achitecture</dt>
                 <dd class="col-6">{architecture}</dd>
