@@ -17,12 +17,14 @@ const test = require('./routes/api/test')
 const checkConnection = require('./routes/api/checkConnection')
 const loadAllTables = require('./routes/api/loadAllTables')
 const runTest = require('./routes/api/loadtest')
+const systemInfo = require('./routes/api/systemInformation')
 
 app.use('/api/posts', posts)
 app.use('/api/test', test)
 app.use('/api/checkconnection', checkConnection)
 app.use('/api/load', loadAllTables)
 app.use('/api', runTest)
+app.use('/api/sys', systemInfo)
 
 // Handle production
 if(process.env.NODE_ENV === 'production') {

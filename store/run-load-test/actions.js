@@ -1,5 +1,7 @@
+import axios from 'axios'
+
 export default {
-  runLoadTest ({ commit }) {
+  runLoadTest ({ commit, state, dispatch }) {
     let statusMsg = 'Idle'
     let loading = false
     const hasError = false
@@ -38,42 +40,76 @@ export default {
 
     // Simulate loading 3
     setTimeout(() => {
-      progressValue = 60
+      progressValue = 55
       progressMsg = 'Running database load tests...'
       progressStyle = `width: ${progressValue}%`
       commit('setProgressStatus', { progressValue, progressMsg, progressStyle })
     }, 3500)
 
-    // Simulate loading 4
-    setTimeout(() => {
-      progressValue = 80
+    // Running test
+
+    dispatch('loadTestResults').then(() => {
+      // Set load test counter
+      console.log(state.firstRun)
+      if (state.firstRun === false) {
+        const newValue = true
+        console.log(newValue)
+        commit('setLoadTestFirstRun', { newValue })
+      }
+
+      progressValue = 90
       progressMsg = '$&#$(#H$J#@H$UIG#(@$*(DHU(@HD(#GU('
       progressStyle = `width: ${progressValue}%`
       commit('setProgressStatus', { progressValue, progressMsg, progressStyle })
-    }, 4500)
 
-    // Simulate loading 4
-    setTimeout(() => {
-      progressValue = 100
-      progressMsg = 'Database load test completed!'
-      progressStyle = `width: ${progressValue}%`
-      commit('setProgressStatus', { progressValue, progressMsg, progressStyle })
-    }, 5000)
+      setTimeout(() => {
+        progressValue = 100
+        progressMsg = 'Database load test completed!'
+        progressStyle = `width: ${progressValue}%`
+        commit('setProgressStatus', { progressValue, progressMsg, progressStyle })
+      }, 500)
 
-    // Simulate run load test
-    setTimeout(() => {
-      statusMsg = 'Running test...'
-      loading = true
-      commit('setLoadTestStatus', { statusMsg, loading, hasError, idle, completed })
-    }, 5500)
+      // Simulate completed
+      setTimeout(() => {
+        statusMsg = 'Test completed!'
+        loading = false
+        idle = true
+        completed = true
+        commit('setLoadTestStatus', { statusMsg, loading, hasError, idle, completed })
+      }, 1000)
+    })
+  },
+  async loadTestResults ({ commit }) {
+    const config = {
+      headers: {
+        Accept: 'application/json'
+      }
+    }
 
-    // Simulate completed
-    setTimeout(() => {
-      statusMsg = 'Test completed!'
-      loading = false
-      idle = true
-      completed = true
-      commit('setLoadTestStatus', { statusMsg, loading, hasError, idle, completed })
-    }, 6000)
+    let mysqlResult
+    let mysqlRequests = []
+
+    let mssqlResult
+    let mssqlRequests = []
+
+    let mongoResult
+    let mongoRequests = []
+
+    try {
+      const response = await axios.get('http://localhost:5000/api/run', config)
+      mysqlResult = response.data.result[0]
+      mysqlRequests = response.data.requests.MySQL
+
+      mssqlResult = response.data.result[1]
+      mssqlRequests = response.data.requests.MSSQL
+
+      mongoResult = response.data.result[2]
+      mongoRequests = response.data.requests.MongoDB
+
+      commit('setLoadTestResults', { mysqlResult, mssqlResult, mongoResult })
+      commit('setLoadTestRequests', { mysqlRequests, mssqlRequests, mongoRequests })
+    } catch (err) {
+      // console.log(err)
+    }
   }
 }

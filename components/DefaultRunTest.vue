@@ -9,9 +9,6 @@
               <button class="btn btn-danger btn-block py-3" @click="runLoadTest">Run load test</button>
             </div>
             <div class="col">
-              <button class="btn btn-dark btn-block py-3">Query Performance</button>
-            </div>
-            <div class="col">
               <button class="btn btn-light btn-block py-3">Configure settings</button>
             </div>
           </div>

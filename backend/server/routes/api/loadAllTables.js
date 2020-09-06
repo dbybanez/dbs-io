@@ -212,10 +212,7 @@ async function checkMSSQLConnection() {
               })
             }
           })
-
-          
         }
-        
       })
     } catch (err) {
       result.error = {
@@ -238,6 +235,10 @@ async function retrieveAllTableDataMSSQL (table, pool) {
     let query_result = []
     await pool.query(query, function (error, results, fields) {
       if(error) throw error
+
+      // check memory usage for every table query
+      // console.log(`Heap Used (mb): ${process.memoryUsage().heapUsed / 1024 / 1024}`)
+      
       if(results.recordset.length > 0) {
         for (result in results.recordset) {
           query_result.push(results.recordset[result])
@@ -246,7 +247,12 @@ async function retrieveAllTableDataMSSQL (table, pool) {
       let res = JSON.parse(JSON.stringify(query_result))
       let value = {
         tableName: table,
-        tableData: res
+        tableData: res,
+        memoryUsage: {
+          "Resident Set Size (mb)": process.memoryUsage().rss / 1024 / 1024,
+          "Total Size of the Heap (mb)": process.memoryUsage().heapTotal / 1024 / 1024,
+          "Heap Used (mb)": process.memoryUsage().heapUsed / 1024 / 1024
+        }
       }
       resolve(value)
     })

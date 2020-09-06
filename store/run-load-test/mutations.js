@@ -10,5 +10,18 @@ export default {
     state.progress.value = progressValue
     state.progress.msg = progressMsg
     state.progress.style = progressStyle
+  },
+  setLoadTestResults (state, { mysqlResult, mssqlResult, mongoResult }) {
+    state.results.mysqlResult = mysqlResult
+    state.results.mssqlResult = mssqlResult
+    state.results.mongoResult = mongoResult
+  },
+  setLoadTestRequests (state, { mysqlRequests, mssqlRequests, mongoRequests }) {
+    state.requests.mysqlRequests = mysqlRequests
+    state.requests.mysqlRequests = mssqlRequests
+    state.requests.mysqlRequests = mongoRequests
+  },
+  setLoadTestFirstRun (state, { newValue }) {
+    state.firstRun = newValue
   }
 }

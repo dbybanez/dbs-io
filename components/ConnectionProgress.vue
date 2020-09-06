@@ -5,7 +5,7 @@
         <div class="col-9">
           <div class="progress">
             <div
-              class="progress-bar bg-danger"
+              class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
               role="progressbar"
               :style="progressStatus.style"
               aria-valuenow="30"
