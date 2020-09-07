@@ -2,6 +2,11 @@
   <div class="row justify-content-center">
     <div class="col-11 col-lg-10">
       <div class="row">
+        <div class="col mb-4">
+          <LineGraph />
+        </div>
+      </div>
+      <div class="row">
         <div class="col-4">
           <h5 class="mb-4">Operating System</h5>
         </div>
@@ -233,8 +238,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import LineGraph from './Line'
 
 export default {
+  components: {
+    LineGraph
+  },
   name: 'LoadTestResults',
   computed: {
     ...mapGetters({

@@ -1,5 +1,5 @@
 export default () => ({
-  firstRun: false,
+  firstRun: true, // temporarily true so you can edit charts. revert to false after youre done
   loadTest: {
     statusMsg: 'Idle',
     loading: false,
