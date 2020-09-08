@@ -52,15 +52,9 @@ async function initLoadTest() {
       promises.push(runLoadTest(config))
     })
 
-    Promise.all(promises).then((result) => {
-      // console.log(os.cpus())
-      // console.log(os.totalmem())
-      // console.log(os.freemem())
-      
-
+    Promise.all(promises).then((result) => {    
       // Map instances to their corresponding databases
       results_statusCallback.forEach((request) => {
-
         // Using modulo because instanceIndex increments all the time. No control
         if((request.instanceIndex % 3) === 0) { // MySQL
           mysql_requests.push(request)
@@ -71,11 +65,7 @@ async function initLoadTest() {
         }
       })
 
-      // console.log(`Results total statusCallback: ${results_statusCallback.length}`)
-      // console.log(`Results total mysql_requests: ${mysql_requests.length}`)
-      // console.log(`Results total mssql_requests: ${mssql_requests.length}`)
-      // console.log(`Results total mongo_requests: ${mongo_requests.length}`)
-
+      // Sort MySQL requests by request index
       mysql_requests.sort((a, b) => {
         if ( a.requestIndex < b.requestIndex ){
           return -1;
@@ -85,7 +75,7 @@ async function initLoadTest() {
         }
         return 0;
       })
-
+      // Sort MSSQL requests by request index
       mssql_requests.sort((a, b) => {
         if ( a.requestIndex < b.requestIndex ){
           return -1;
@@ -95,7 +85,7 @@ async function initLoadTest() {
         }
         return 0;
       })
-
+      // Sort MongoDB requests by request index
       mongo_requests.sort((a, b) => {
         if ( a.requestIndex < b.requestIndex ){
           return -1;
@@ -105,6 +95,12 @@ async function initLoadTest() {
         }
         return 0;
       })
+
+      let mysqlVal = mysql_requests.map((value, index) => {
+        console.log(value)
+      })
+
+      
 
       let results = {
         result: result,
@@ -154,26 +150,24 @@ async function runLoadTest (config) {
 
 
 function statusCallback(error, result, latency) {
-  // console.log('Request loadtest() instance index: ', result.instanceIndex);
-  // console.log(latency)
   let value = {
-    // errors: error,
     requestIndex: result.requestIndex,
-    requestPerSecond: latency.rps,
-    meanLatencyMs: latency.meanLatencyMs,
     requestElapsed: result.requestElapsed,
-    instanceIndex: result.instanceIndex
+    instanceIndex: result.instanceIndex,
+    latency: {
+      totalRequests: latency.totalRequests,
+      totalTimeSeconds: latency.totalTimeSeconds,
+      requestPerSecond: latency.rps,
+      meanLatencyMs: latency.meanLatencyMs,
+    },
+    errors: error
   }
   results_statusCallback.push(value)
-  // console.log(results)
-  // console.log('=======================');
-  //   console.log(`Requests: ${result.requestIndex}, Requests per second: ${result.requestElapsed}`)
-  //   // console.log('Current latency %j, error %j', latency, error);
-  //   console.log('----');
-  //   // console.log('Request elapsed milliseconds: ', result.requestElapsed);
-  //   // console.log('Request index: ', result.requestIndex);
-    
-  // console.log('=======================');
+  // console.log('Current latency %j, result %j, error %j', latency, result, error);
+  // console.log('----');
+  // console.log('Request elapsed milliseconds: ', result.requestElapsed);
+  // console.log('Request index: ', result.requestIndex);
+  // console.log('Request loadtest() instance index: ', result.instanceIndex);
 }
 
 module.exports = router
