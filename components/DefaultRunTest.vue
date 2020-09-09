@@ -6,7 +6,8 @@
           <p class="my-3 text-center">To run a quick test, click Run load test.</p>
           <div class="row">
             <div class="col">
-              <button class="btn btn-danger btn-block py-3" @click="runLoadTest">Run load test</button>
+              <button class="btn btn-danger btn-block py-3" @click="runLoadTest" v-if="mongoStatus.isActive && mysqlStatus.isActive && mysqlStatus.isActive">Run load test</button>
+              <button class="btn btn-danger btn-block py-3" disabled v-else>Run load test</button>
             </div>
             <div class="col">
               <button class="btn btn-light btn-block py-3">Configure settings</button>
@@ -24,7 +25,9 @@ import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'DefaultRunTest',
   data () {
-    return {}
+    return {
+      status: false
+    }
   },
   methods: {
     ...mapActions({
@@ -33,7 +36,10 @@ export default {
   },
   computed: {
     ...mapGetters({
-      loadTestStatus: 'run-load-test/loadTestStatus'
+      loadTestStatus: 'run-load-test/loadTestStatus',
+      mongoStatus: 'status-checker/mongoStatus',
+      mysqlStatus: 'status-checker/mysqlStatus',
+      mssqlStatus: 'status-checker/mssqlStatus'
     })
   }
 }
