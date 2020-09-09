@@ -44,18 +44,23 @@ export default {
       progressMsg = 'Running database load tests...'
       progressStyle = `width: ${progressValue}%`
       commit('setProgressStatus', { progressValue, progressMsg, progressStyle })
-    }, 3500)
+    }, 2500)
 
     // Running test
 
     dispatch('loadTestResults').then(() => {
       // Set load test counter
-      console.log(state.firstRun)
+      // console.log(state.firstRun)
       if (state.firstRun === false) {
         const newValue = true
-        console.log(newValue)
+        // console.log(newValue)
         commit('setLoadTestFirstRun', { newValue })
       }
+
+      /**
+       * Get System information
+       */
+      this.dispatch('system-information/runSystemInfo')
 
       progressValue = 90
       progressMsg = '$&#$(#H$J#@H$UIG#(@$*(DHU(@HD(#GU('
@@ -87,27 +92,76 @@ export default {
     }
 
     let mysqlResult
-    let mysqlRequests = []
+    const mysqlRequests = []
 
     let mssqlResult
-    let mssqlRequests = []
+    const mssqlRequests = []
 
     let mongoResult
-    let mongoRequests = []
+    const mongoRequests = []
 
     try {
       const response = await axios.get('http://localhost:5000/api/run', config)
+      /**
+       * MySQL Process Data
+       */
       mysqlResult = response.data.result[0]
-      mysqlRequests = response.data.requests.MySQL
+      // mysqlRequests = response.data.requests.MySQL
+      response.data.requests.MySQL.forEach((element) => {
+        mysqlRequests.push(element.latency.totalRequests)
+      })
+      let incrementBy = Math.floor(mysqlRequests.length / 20)
+      const newMySQL = []
+      for (let i = 0; i < mysqlRequests.length; i += incrementBy) {
+        newMySQL.push(mysqlRequests[i])
+      }
+      if (newMySQL.length < 21) {
+        newMySQL.unshift(0)
+      }
+      // console.log(`MySQL increment by: ${incrementBy}`)
+      // console.log(newMySQL)
 
+      /**
+       * MSSQL Process Data
+       */
       mssqlResult = response.data.result[1]
-      mssqlRequests = response.data.requests.MSSQL
+      // mssqlRequests = response.data.requests.MSSQL
+      response.data.requests.MSSQL.forEach((element) => {
+        mssqlRequests.push(element.latency.totalRequests)
+      })
+      incrementBy = Math.floor(mssqlRequests.length / 20)
+      const newMSSQL = []
+      for (let i = 0; i < mssqlRequests.length; i += incrementBy) {
+        newMSSQL.push(mssqlRequests[i])
+      }
+      if (newMSSQL.length < 21) {
+        newMSSQL.unshift(0)
+      }
+      // console.log(`MSSQL increment by: ${incrementBy}`)
+      // console.log(newMSSQL)
 
+      /**
+       * MongoDB Process Data
+       */
       mongoResult = response.data.result[2]
-      mongoRequests = response.data.requests.MongoDB
+      // mongoRequests = response.data.requests.MongoDB
+      response.data.requests.MongoDB.forEach((element) => {
+        mongoRequests.push(element.latency.totalRequests)
+      })
+      incrementBy = Math.floor(mongoRequests.length / 20)
+      const newMongoDB = []
+      for (let i = 0; i < mongoRequests.length; i += incrementBy) {
+        newMongoDB.push(mongoRequests[i])
+      }
+      if (newMongoDB.length < 21) {
+        newMongoDB.unshift(0)
+      }
+      // console.log(`MongoDB increment by: ${incrementBy}`)
+      // console.log(newMongoDB)
 
       commit('setLoadTestResults', { mysqlResult, mssqlResult, mongoResult })
-      commit('setLoadTestRequests', { mysqlRequests, mssqlRequests, mongoRequests })
+      // commit('setLoadTestRequests', { mysqlRequests, mssqlRequests, mongoRequests })
+      commit('setLoadTestRequests', { newMySQL, newMSSQL, newMongoDB })
     } catch (err) {
       // console.log(err)
     }

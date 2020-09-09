@@ -16,10 +16,27 @@ export default {
     state.results.mssqlResult = mssqlResult
     state.results.mongoResult = mongoResult
   },
-  setLoadTestRequests (state, { mysqlRequests, mssqlRequests, mongoRequests }) {
-    state.requests.mysqlRequests = mysqlRequests
-    state.requests.mysqlRequests = mssqlRequests
-    state.requests.mysqlRequests = mongoRequests
+  // setLoadTestRequests (state, { mysqlRequests, mssqlRequests, mongoRequests }) {
+  setLoadTestRequests (state, { newMySQL, newMSSQL, newMongoDB }) {
+    // console.log(mysqlRequests.latency.totalRequests)
+    // state.requests.mysqlRequests = []
+    // mysqlRequests.forEach((element) => {
+    //   state.requests.mysqlRequests.push(element.latency.totalRequests)
+    // })
+    // state.requests.mssqlRequests = []
+    // mssqlRequests.forEach((element) => {
+    //   state.requests.mssqlRequests.push(element.latency.totalRequests)
+    // })
+    // state.requests.mongoRequests = []
+    // mongoRequests.forEach((element) => {
+    //   state.requests.mongoRequests.push(element.latency.totalRequests)
+    // })
+    state.requests.mysqlRequests = newMySQL
+    state.requests.mssqlRequests = newMSSQL
+    state.requests.mongoRequests = newMongoDB
+    // state.requests.mysqlRequests = mysqlRequests
+    // state.requests.mssqlRequests = mssqlRequests
+    // state.requests.mongoRequests = mongoRequests
   },
   setLoadTestFirstRun (state, { newValue }) {
     state.firstRun = newValue

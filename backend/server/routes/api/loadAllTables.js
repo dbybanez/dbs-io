@@ -247,12 +247,7 @@ async function retrieveAllTableDataMSSQL (table, pool) {
       let res = JSON.parse(JSON.stringify(query_result))
       let value = {
         tableName: table,
-        tableData: res,
-        memoryUsage: {
-          "Resident Set Size (mb)": process.memoryUsage().rss / 1024 / 1024,
-          "Total Size of the Heap (mb)": process.memoryUsage().heapTotal / 1024 / 1024,
-          "Heap Used (mb)": process.memoryUsage().heapUsed / 1024 / 1024
-        }
+        tableData: res
       }
       resolve(value)
     })

@@ -1,10 +1,10 @@
 export default () => ({
   systemInfo: {
-    architecture: '',
-    cpus: '',
-    hostname: '',
-    network: '',
-    usedMemory: '',
-    freeMemory: ''
+    platform: null,
+    type: null,
+    release: null,
+    totalmem: null,
+    freemem: null,
+    cpus: null
   }
 })

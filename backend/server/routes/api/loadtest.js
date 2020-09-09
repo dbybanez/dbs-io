@@ -5,7 +5,6 @@ const os = require('os');
 
 router.get('/run', async (req, res) => {
   let result = await initLoadTest()
-  // let result = true
   res.send(await result)
 })
 
@@ -16,6 +15,10 @@ let mongo_requests = []
 
 async function initLoadTest() {
   return new Promise((resolve, reject) => {
+
+    /**
+     * Loadtest API configurations
+     */
     const configs = [
       {
         db: "MySQL",
@@ -47,7 +50,10 @@ async function initLoadTest() {
     ]
   
     let promises = []
-  
+    
+    /**
+     * Loop through each configurations
+     */
     configs.forEach((config, index) => {
       promises.push(runLoadTest(config))
     })
@@ -65,42 +71,45 @@ async function initLoadTest() {
         }
       })
 
-      // Sort MySQL requests by request index
-      mysql_requests.sort((a, b) => {
-        if ( a.requestIndex < b.requestIndex ){
-          return -1;
-        }
-        if ( a.requestIndex > b.requestIndex ){
-          return 1;
-        }
-        return 0;
-      })
-      // Sort MSSQL requests by request index
-      mssql_requests.sort((a, b) => {
-        if ( a.requestIndex < b.requestIndex ){
-          return -1;
-        }
-        if ( a.requestIndex > b.requestIndex ){
-          return 1;
-        }
-        return 0;
-      })
-      // Sort MongoDB requests by request index
-      mongo_requests.sort((a, b) => {
-        if ( a.requestIndex < b.requestIndex ){
-          return -1;
-        }
-        if ( a.requestIndex > b.requestIndex ){
-          return 1;
-        }
-        return 0;
-      })
+      // // Sort MySQL requests by request index
+      // mysql_requests.sort((a, b) => {
+      //   if ( a.requestIndex < b.requestIndex ){
+      //     return -1;
+      //   }
+      //   if ( a.requestIndex > b.requestIndex ){
+      //     return 1;
+      //   }
+      //   return 0;
+      // })
+      // // Sort MSSQL requests by request index
+      // mssql_requests.sort((a, b) => {
+      //   if ( a.requestIndex < b.requestIndex ){
+      //     return -1;
+      //   }
+      //   if ( a.requestIndex > b.requestIndex ){
+      //     return 1;
+      //   }
+      //   return 0;
+      // })
+      // // Sort MongoDB requests by request index
+      // mongo_requests.sort((a, b) => {
+      //   if ( a.requestIndex < b.requestIndex ){
+      //     return -1;
+      //   }
+      //   if ( a.requestIndex > b.requestIndex ){
+      //     return 1;
+      //   }
+      //   return 0;
+      // })
 
-      let mysqlVal = mysql_requests.map((value, index) => {
-        console.log(value)
-      })
+      let mysqlFilteredRequests = filterRequests(mysql_requests)
+      // console.log(`20 Requests for MySQL: ${mysqlFilteredRequests.length}`)
 
-      
+      let mssqlFilteredRequests = filterRequests(mssql_requests)
+      // console.log(`20 Requests for MSSQL: ${mssqlFilteredRequests.length}`)
+
+      let mongoFilteredRequests = filterRequests(mongo_requests)
+      // console.log(`20 Requests for MongoDB: ${mongoFilteredRequests.length}`)
 
       let results = {
         result: result,
@@ -122,33 +131,86 @@ async function initLoadTest() {
   })
 }
 
+/**
+ * 
+ * @param {Object} config - configurations set by configs variable
+ */
 async function runLoadTest (config) {
   return new Promise((resolve, reject) => {
-    // console.dir(config.option.statusCallback)
+    /**
+     * Run loadtest API 
+     * Refer to: https://www.npmjs.com/package/loadtest
+     */
     loadtest.loadTest(config.option, function (error, result ) {
       if(error) throw error
-      // console.log(process.memoryUsage().heapUsed / 1024 / 1024)
 
-      // console.log(res)
+      /**
+       * rrs: Resident Set Size (mb)
+       * heapTotal: Total Size of the Heap (mb)
+       * heapUsed: Heap Used (mb)
+       * 
+       * Refer to: https://stackoverflow.com/questions/20018588/how-to-monitor-the-memory-usage-of-node-js
+       * 
+       */
       let value = {
         databaseName: config.db,
         results: result,
         memoryUsage: {
-          "Resident Set Size (mb)": process.memoryUsage().rss / 1024 / 1024,
-          "Total Size of the Heap (mb)": process.memoryUsage().heapTotal / 1024 / 1024,
-          "Heap Used (mb)": process.memoryUsage().heapUsed / 1024 / 1024
+          rrs: process.memoryUsage().rss / 1024 / 1024,
+          heapTotal: process.memoryUsage().heapTotal / 1024 / 1024,
+          heapUsed: process.memoryUsage().heapUsed / 1024 / 1024
         }
       }
-
-      // console.log(`From runLoadTest: ${result.instanceIndex}`)
-
       resolve(value)
     })
   })
 }
 
+/**
+ * Filters requests so that we don't have to display all 1000++ requests
+ * @param {Object} requests - sorted requests from the results_statusCallback results
+ */
+function filterRequests(requests) {
+  let value = []
+  let i = Math.floor(requests[0].latency.totalTimeSeconds)
+  let done = false
 
+  /**
+   * Go through each requests and get only the first values of the totalTimeSeconds.
+   * 0.123, 0.234, 0.566, 1.123, 1.442, 1.562, 2.234, 2.561, 2.731
+   * 0 = 0.123;
+   * 1 = 1.123;
+   * 2 = 2.234
+   * 0 in this case represents time. 0 sec, 1 sec, 2 secs, 3 secs, etc.
+   */
+  requests.forEach((item, index) => {
+    /**
+     * The limit of 25 here is for the number of requests you want to get. which in this case is 25.
+     * But since the we specified 20 in the load test API, we only get 19-21 requests. 
+     */
+    if(Math.floor(item.latency.totalTimeSeconds) === i && i < 23 && done === false) {
+      done = true
+      i+=1
+      value.push(item)
+    } else {
+      done = false
+    }
+  })
 
+  return value
+}
+
+/**
+ * Refer to: https://www.npmjs.com/package/loadtest
+ * 
+ * Called from the loadtest function
+ * 
+ * @param {Object} error - Error object when the load test returns an error
+ * @param {Object} result - The result of the load test
+ * @param {Object} latency - The latency of the load test
+ * 
+ * Returns all requests
+ */
 function statusCallback(error, result, latency) {
   let value = {
     requestIndex: result.requestIndex,

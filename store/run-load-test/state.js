@@ -1,5 +1,5 @@
 export default () => ({
-  firstRun: true, // temporarily true so you can edit charts. revert to false after youre done
+  firstRun: false, // temporarily true so you can edit charts. revert to false after youre done
   loadTest: {
     statusMsg: 'Idle',
     loading: false,
@@ -18,8 +18,8 @@ export default () => ({
     mongoResult: null
   },
   requests: {
-    mysqlRequests: [],
-    mssqlRequests: [],
-    mongoRequests: []
+    mysqlRequests: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    mssqlRequests: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    mongoRequests: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   }
 })
