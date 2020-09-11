@@ -41,7 +41,7 @@ export default {
       title: 'DBS.IO',
       meta: [
         {
-          hid: 'description',
+          hid: 'A database performance measurement app',
           name: 'description',
           content: 'Best place for corny dad jokes'
         }
