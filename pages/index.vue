@@ -42,7 +42,7 @@ export default {
       meta: [
         {
           hid: 'A database performance measurement app',
-          name: 'description',
+          name: 'A database performance measurement app',
           content: 'Best place for corny dad jokes'
         }
       ]
